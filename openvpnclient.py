@@ -111,7 +111,7 @@ class OpenVPNClient:
         timer.start()
 
         cmd = [
-            "openvpn",
+            "sudo", "openvpn",
             "--cd", self.ovpn_dir,
             "--config", self.ovpn_file,
             "--dev", "tun_ovpn",
