@@ -3,6 +3,8 @@ This standalone module is intended to handle OpenVPN connections to a remote ser
 
 ## Setup
 ```bash
+python3 -m venv .venv
+. .venv/bin/activate
 pip install -r requirements.txt
 ```
 
