@@ -16,7 +16,7 @@ from types import TracebackType  # noqa: TCH003, used to type annotate
 
 import psutil
 from docopt import docopt
-from typing_extensions import Self
+from typing_extensions import Self  # noqa: TCH003, used to type annotate
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -127,7 +127,7 @@ class OpenVPNClient:
         timer.start()
 
         cmd = [
-            "sudo",
+            "sudo", # required to run openvpn but makes exiting break
             "openvpn",
             "--cd",
             self.ovpn_dir,

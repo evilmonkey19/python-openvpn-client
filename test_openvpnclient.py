@@ -30,7 +30,7 @@ def await_openvpn_cleanup():
     close before the next test runs.
     """
     yield
-    time.sleep(3)
+    time.sleep(6)
 
 
 @pytest.fixture(scope="function")
@@ -84,6 +84,7 @@ def generate_clientconfigs(server_details, ovpn_paths) -> None:
         cert {ovpn_paths['cert']}
         key {ovpn_paths['certkey']}
     """
+    breakpoint()
 
     conf = dedent(client_conf)
     with open(ovpn_paths["clientconfig"], "w") as f:
