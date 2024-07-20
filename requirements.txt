@@ -4,3 +4,4 @@ pytest-tap
 psutil
 docopt
 psutil
+typing_extensions

@@ -13,10 +13,10 @@ from subprocess import PIPE, Popen
 from tempfile import gettempdir
 from threading import Lock
 from types import TracebackType  # noqa: TCH003, used to type annotate
-from typing import Self
 
 import psutil
 from docopt import docopt
+from typing_extensions import Self
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -283,5 +283,5 @@ if __name__ == "__main__":
         config_file = args["--config"]
         OpenVPNClient(config_file).connect(stay_alive_on_exit=True)
     else:
-        print(usage)  # noqa: T201, print when invoked as script
+        print(usage)
         sys.exit(1)
