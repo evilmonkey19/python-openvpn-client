@@ -1,0 +1,14 @@
+---
+
+name: Lint
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch: ~
+
+jobs:
+  lint:
+    uses: KTH-SSAS/twmn-ci/.github/workflows/reusable-lint.yml@master
+    secrets: inherit
