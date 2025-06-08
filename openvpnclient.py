@@ -14,9 +14,9 @@ from pathlib import Path
 from subprocess import PIPE, CalledProcessError, check_call
 from tempfile import gettempdir
 from argparse import ArgumentParser
+import shlex
 
 import psutil
-from typing_extensions import Self
 
 PID_FILE = Path(gettempdir()) / "openvpnclient.pid"
 STDERR_FILE = Path(gettempdir()) / "openvpnclient.stderr"
@@ -88,7 +88,7 @@ class OpenVPNClient:
         self.connect_timeout = connect_timeout
         self.lock = threading.Lock()
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> 'OpenVPNClient':
         """Auto-connect when using a context manager."""
         self.connect()
         return self
@@ -140,15 +140,14 @@ class OpenVPNClient:
         # 2. has passwordless sudo enabled
         must_supply_password = OpenVPNClient._must_supply_password()
         sudo_pw_option = "-S " if must_supply_password else ""
-        askpass_option = f'--askpass {self.askpass_file}' if self.askpass_file else ''
+        askpass_option = f"--askpass '{self.askpass_file}'" if self.askpass_file else ''
+        route_up_cmd = f'{sys.executable} -c "import os, signal; os.kill({os.getpid()}, signal.SIGUSR1)"'
         cmd = (
-            f"sudo {sudo_pw_option}openvpn --cd {self.ovpn_dir} --config {self.ovpn_file} {askpass_option} "
+            f"sudo {sudo_pw_option} openvpn --cd {self.ovpn_dir} --config '{self.ovpn_file}' {askpass_option} "
             f"--dev tun_ovpn --connect-retry-max 3 --connect-timeout {self.connect_timeout} "
-            "--script-security 2 --route-delay 1 --route-up"
-        ).split()
-        cmd.append(  # command for route-up should be 'one argument'
-            f"{sys.executable} -c 'import os, signal; os.kill({os.getpid()}, signal.SIGUSR1)'"
+            f"--script-security 2 --route-delay 1 --route-up '{route_up_cmd}'"
         )
+        cmd = shlex.split(cmd)
         self.proc = subprocess.Popen(
             cmd,
             stdin=PIPE,
@@ -322,20 +321,6 @@ class OpenVPNClient:
             OpenVPNClient._on_process_exit(pid=process.pid, timeout=5)
 
 
-usage = """
-    Usage:
-        openvpnclient.py --config=<config_file>
-        openvpnclient.py --disconnect
-
-    Options:
-        -h --help                Show this help message
-        --config=<config_file>   Configuration file (.ovpn)
-        --disconnect             Disconnect ongoing connection
-
-    Notes:
-        Any ca/crt/pkey files referenced in the .ovpn file should be relative
-        to the .ovpn file's parent directory.
-"""
 if __name__ == "__main__":
     argparse = ArgumentParser(description="OpenVPN Client")
     argparse.add_argument("--config", type=str, help="Configuration file (.ovpn)")
@@ -351,5 +336,5 @@ if __name__ == "__main__":
         OpenVPNClient(
             ovpn_file=args.config,
             askpass_file=args.askpass,
-            connect_timeout=10
+            connect_timeout=20
         ).connect(sigint_disconnect=True)
