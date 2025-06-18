@@ -307,7 +307,7 @@ class OpenVPNClient:
             process.stdin.flush()
 
         try:
-            OpenVPNClient._on_process_exit(pid=process.pid, timeout=10)
+            OpenVPNClient._on_process_exit(pid=process.pid, timeout=30)
         except psutil.TimeoutExpired:
             msg = "Failed to terminate OpenVPN process, killing instead"
             logger.info(msg)
@@ -318,7 +318,7 @@ class OpenVPNClient:
                 process.stdin.write(os.environ["SUDO_PASSWORD"] + "\n")
                 process.stdin.flush()
 
-            OpenVPNClient._on_process_exit(pid=process.pid, timeout=5)
+            OpenVPNClient._on_process_exit(pid=process.pid, timeout=30)
 
 
 if __name__ == "__main__":
